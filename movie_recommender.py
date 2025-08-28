@@ -32,5 +32,11 @@ def load_rating_data_csv(data_path, n_users, n_movies):
     return data, movie_n_rating, movie_id_mapping 
 
 
-load_rating_data_csv(data_path, n_users, n_movies)
+data, movie_n_rating, movie_id_mapping =  load_rating_data_csv(data_path, n_users, n_movies)
 
+#checking data distribution: from 1-5 ratting how many movie is ratted
+def display_distribution(data): 
+    values, counts = np.unique(data, return_counts=True)  #finds all unique values in data amd return_counts returns how many times unique value is appeared
+    for value, count in zip(values, counts): 
+        print(f'Number of rating {value}: {count}')
+display_distribution(data)
