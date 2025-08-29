@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd
 from collections import defaultdict
+from sklearn.model_selection import train_test_split
 
 data_path = 'Movie Data/ml-latest-small/ratings.csv'
 read_data = pd.read_csv("Movie Data/ml-latest-small/ratings.csv")
@@ -39,15 +40,17 @@ def display_distribution(data):
     values, counts = np.unique(data, return_counts=True)  #finds all unique values in data amd return_counts returns how many times unique value is appeared
     for value, count in zip(values, counts): 
         print(f'Number of rating {value}: {count}')
-display_distribution(data)
+#display_distribution(data)
 
 #finding most rated movie
 movie_rating_lists = list(movie_n_rating.items()) #converting dictionary into lists of movie_id, num_ratings
 #sort by number of ratings (second in the tuple) in descending order
 sorted_movies = sorted(movie_rating_lists, key=lambda d:d[1], reverse=True)
+for movie_id, n_ratings in sorted_movies[:10]: #checking top 10 movies 
+    print(f"MovieID {movie_id} has highest {n_ratings} rating.")
 #picking the top one rated movie
 movie_id_most, n_rating_most = sorted_movies[0]
-print(f"MovieID {movie_id_most} has highest {n_rating_most} rating.")
+print(f"MovieID {movie_id_most} is the highest {n_rating_most} rated movie.")
 
 #since highest rated movie is found we have to target that movie and organized the data accordingly
 X_raw = np.delete(data, movie_id_mapping[movie_id_most], axis=1) #delete the entire column of that higest rated movie from data. Now all users rating are available except the highest one
@@ -60,4 +63,16 @@ Y = Y_raw[Y_raw>0] #actual ratings of that highest rated movie.
 print('Shape of X:', X.shape)
 print('Shape of Y:', Y.shape)
 
-display_distribution(Y)
+#display_distribution(Y)
+recommend = 3 #we selected that rating greated than 3 is being liked movie
+Y[Y<=recommend]= 0 #converting all those rating less than 3 to 0 
+Y[Y>recommend]= 1  #converting all those rating greater than 3 to 1
+
+n_pos = (Y==1).sum()
+n_neg = (Y==0).sum()
+print(f"{n_pos} possitive samples and {n_neg} negative sample")
+
+
+#preparing dataset for supervised ML
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.2, random_state=42) #test_size=0.2 → 20% of the data will be test set, 80% will be training set. random_state=42 → sets the random seed so results are reproducible (you get the same split every time you run)
+print(len(Y_train), len(Y_test))
