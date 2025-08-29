@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
 
 data_path = 'Movie Data/ml-latest-small/ratings.csv'
 read_data = pd.read_csv("Movie Data/ml-latest-small/ratings.csv")
@@ -72,7 +73,18 @@ n_pos = (Y==1).sum()
 n_neg = (Y==0).sum()
 print(f"{n_pos} possitive samples and {n_neg} negative sample")
 
-
 #preparing dataset for supervised ML
 X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.2, random_state=42) #test_size=0.2 → 20% of the data will be test set, 80% will be training set. random_state=42 → sets the random seed so results are reproducible (you get the same split every time you run)
 print(len(Y_train), len(Y_test))
+
+#taining naive bayes with training data
+clf = MultinomialNB(alpha=1.0, fit_prior=True)
+clf.fit (X_train, Y_train)
+prediction_prob = clf.predict_proba(X_test)
+print(prediction_prob[0:10])
+
+prediction = clf.predict(X_test)
+print(prediction[:10])
+
+accuracy = clf.score(X_test, Y_test)
+print(f"The accuracy is : {accuracy*100:.1f}%")
