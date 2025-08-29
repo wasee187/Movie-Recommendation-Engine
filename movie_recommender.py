@@ -40,3 +40,24 @@ def display_distribution(data):
     for value, count in zip(values, counts): 
         print(f'Number of rating {value}: {count}')
 display_distribution(data)
+
+#finding most rated movie
+movie_rating_lists = list(movie_n_rating.items()) #converting dictionary into lists of movie_id, num_ratings
+#sort by number of ratings (second in the tuple) in descending order
+sorted_movies = sorted(movie_rating_lists, key=lambda d:d[1], reverse=True)
+#picking the top one rated movie
+movie_id_most, n_rating_most = sorted_movies[0]
+print(f"MovieID {movie_id_most} has highest {n_rating_most} rating.")
+
+#since highest rated movie is found we have to target that movie and organized the data accordingly
+X_raw = np.delete(data, movie_id_mapping[movie_id_most], axis=1) #delete the entire column of that higest rated movie from data. Now all users rating are available except the highest one
+Y_raw = data[:, movie_id_mapping[movie_id_most]] #select the column of higest rated movie for all users
+
+#Y_raw>0 creates a boolean mask (True if user rated the movie, False if not).Y_raw = [5, 0, 3, 0, 4] Y_raw > 0 → [True, False, True, False, True]
+  
+X = X_raw[Y_raw >0] # filter only those user's rating who have rated the highest rated movie
+Y = Y_raw[Y_raw>0] #actual ratings of that highest rated movie. 
+print('Shape of X:', X.shape)
+print('Shape of Y:', Y.shape)
+
+display_distribution(Y)
